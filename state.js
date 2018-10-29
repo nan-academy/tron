@@ -3,6 +3,8 @@ import map from './izi/map.js'
 import rseed from './rseed.js'
 import qs from './izi/query-string.js'
 
+const noOp = _ => _
+
 const rnd = Math.random
 
 const setRoute = obj => {
