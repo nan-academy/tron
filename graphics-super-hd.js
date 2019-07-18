@@ -87,6 +87,7 @@ export default {
       position: 'relative',
       margin: '0 0 0 auto',
       width: `${S * SIZE}px`,
+      overflow: 'hidden',
     }, players.map(({ name, x, y, color }) => names[name] = h.div.style({
       position: 'absolute',
       left: 0,

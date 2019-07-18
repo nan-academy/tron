@@ -14,7 +14,7 @@ http-server
 npm install -g http-server
 ```
 
-- Online, just open [nan-academy.github.io/tron](https://nan-academy.github.io/tron?users=random,random)
+- Online, just open [nan-academy.github.io/tron](https://nan-academy.github.io/tron?users=nan-academy,nan-academy.fr)
 
 ### Rules
 - You have to move every turn *(you can't stay still)*
@@ -40,7 +40,7 @@ npm install -g http-server
 - `S` load a new play (new seed)
 
 ### How to write your AI
-- Copy the file [/ai/random.js](https://github.com/nan-academy/tron/blob/master/ai/random.js) to /ai/**GITHUB_LOGIN**.js
+- Copy the file [/ai/nan-academy.js](https://github.com/nan-academy/tron/blob/master/ai/nan-academy.js) to /ai/**GITHUB_LOGIN**.js
 - You may now edit the `update` function which is called each turn
 
 ### Publish your AI
