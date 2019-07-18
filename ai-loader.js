@@ -2,7 +2,7 @@ const getShaUrl = login =>
   `https://api.github.com/repos/${login}/tron/commits/master`
 
 const getAIUrl = (login, sha, ai) =>
-  `https://rawgit.com/${login}/tron/${sha}/ai/${ai || login}.js`
+  `https://rawcdn.githack.com/${login}/tron/${sha}/ai/${ai || login}.js`
 
 const toBlob = r => r.blob()
 const toUrlObject = b => URL.createObjectURL(b, { "type" : "text/javascript" })
