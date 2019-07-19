@@ -46,7 +46,7 @@ const decSpeed = () =>
 const incSpeed = () =>
   speedFactor.set(Math.min(speedFactor() * 2, speedFactorBounds[1]))
 
-setRoute({ seed: seed(), users: urlParams.users.sort() })
+setRoute({ seed: seed(), users: (urlParams.users || ['nan-academy']).sort() })
 
 export default {
   players,
