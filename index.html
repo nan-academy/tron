@@ -188,16 +188,39 @@ const buildInfo = (player, i) => {
 }
 
 const notInBounds = n => n >= 100 || n < 0
+
+const getShaUrl = login =>
+  `https://api.github.com/repos/${login}/tron/commits/master`
+
+const getAIUrl = (login, sha, ai) =>
+  `https://rawcdn.githack.com/${login}/tron/${sha}/ai/${ai || login}.js`
+
+const getSha = async login => (await (await fetch(getShaUrl(login))).json()).sha
+const toBlob = r => r.blob()
+const toUrlObject = b => URL.createObjectURL(b, { "type" : "text/javascript" })
+const memo = {}
+const fetchBlob = url => memo[url]
+  || (memo[url] = fetch(url).then(toBlob).then(toUrlObject))
+
+const getGithackUrl = async (login, sha) => {
+  if (!sha || sha === 'master') {
+    sha = localStorage[login] || (localStorage[login] = await getSha(login))
+  }
+  return getAIUrl(login, sha)
+}
+
+const remoteURL = (login, sha) => location.host.startsWith('git.')
+  ? `${location.origin}/${login}/tron/raw/branch/${sha || 'master'}/ai.js`
+  : getGithackUrl(login, sha)
+
 const formatURL = url => {
   if (url.startsWith('/')) return url
   if (url.startsWith('./')) return url
   if (url.startsWith('https://')) return url
   if (url.includes(location.hostname)) return `https://${url}`
-  if (url.includes('@')) {
-    const [branch = 'master', login] = url.split('@')
-    return `${location.origin}/${login}/tron/raw/branch/${branch}/ai.js`
-  }
-  return `${location.origin}/${url}`
+  return url.includes('@')
+    ? remoteURL(...url.split('@'))
+    : `${location.origin}/${url}`
 }
 
 const start = async ({ urls, seed }) => {
@@ -261,10 +284,7 @@ const start = async ({ urls, seed }) => {
   }
 
   await Promise.all(players.map(async (player, i) => {
-    player.worker = new Worker(formatURL(player.name), {
-      type: 'module',
-      name: player.name,
-    })
+    
 
     const info = buildInfo(player, i)
     player.score = info.score
@@ -274,26 +294,30 @@ const start = async ({ urls, seed }) => {
       console.log(`${player.name} died because he ${cause} at ${player.x} ${player.y}`)
       player.cause = cause
       player.dead = true
-      player.worker.terminate()
+      player.worker && player.worker.terminate()
       info.status(cause)
     }
 
     // init the worker
-    await new Promise((s, f) => {
-      player.worker.onmessage = e => e.data === 'loaded' ? s() : f(Error(e.data))
-      player.worker.onerror = f
-      player.worker.postMessage(JSON.stringify({ id: player.name, seed }))
-    }).then(() => {
+    try {
+      const url = await fetchBlob(await formatURL(player.name))
+      player.worker = new Worker(url, { type: 'module', name: player.name })
+      await new Promise((s, f) => {
+        player.worker.onmessage = e => e.data === 'loaded' ? s() : f(Error(e.data))
+        player.worker.onerror = f
+        player.worker.postMessage(JSON.stringify({ id: player.name, seed }))
+      })
+
       // activate the AI
       info.status('ACTIVE')
       player.kill = cause => {
         kill(cause)
         next(player)
       }
-    }, err => {
+    } catch (err) {
       console.error(err)
       kill('FAILED-TO-LOAD')
-    })
+    }
 
     move(player.x, player.y, player.color, turn)
 
