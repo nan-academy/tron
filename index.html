@@ -230,7 +230,7 @@ const remoteURL = async (login, sha, ai) => {
 }
 
 const formatURL = url => {
-  if (url.startsWith('/')) return `${location.pathname}/ai${url}`
+  if (url.startsWith('/')) return `${location.pathname}ai${url}`
   if (url.startsWith('https://')) return url
   if (url.includes(location.hostname)) return `https://${url}`
   return url.includes('@') ? remoteURL(...url.split('@')) : `${location.origin}/${url}`
@@ -363,17 +363,10 @@ const start = async ({ urls, seed }) => {
     ai.worker.onerror = ({ lineno }) => {
       const errorCode = ai.code.split('\n')
         .slice(lineno - 5, lineno + 4)
-        .map((l,i) => `%c${lineno - 4 + i}｜ ${l}`)
+        .map((l,i) => `${lineno - 4 + i}｜ ${l}`)
         .join('\n')
 
-      const styles = Array(4)
-        .fill('color:#888;background:black;display: block;padding:0 4px')
-
-      console.log(`${ai.name}:${lineno}\n${errorCode}`, ...[
-        ...styles,
-        'color:white;background:#333;display: block;padding:0 4px',
-        ...styles,
-      ])
+      console.log(`${ai.name}:${lineno}\n${errorCode}`)
 
       ai.kill('AI-ERROR')
     }
