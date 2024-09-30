@@ -8,10 +8,7 @@ git clone https://github.com/nan-academy/tron.git
 cd tron
 
 # from here you can just serv the files:
-http-server
-
-# if you don't have http-server installed:
-npm install -g http-server
+python3 -m http.server 9000
 ```
 
 - Online, just open [nan-academy.github.io/tron](https://nan-academy.github.io/tron?users=nan-academy,nan-academy.fr)
